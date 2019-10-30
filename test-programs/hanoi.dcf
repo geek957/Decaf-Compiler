@@ -1,0 +1,23 @@
+class Program
+{
+	int n1;
+	void hanoi(int n, int a, int b, int c)
+	{
+		if(n==1)
+		{
+			callout("printf","Move disk %d from rod %d to rod %d, \n",n, a, b);
+		}
+		else
+		{
+			hanoi(n-1,a,c,b);
+			callout("printf","Move disk %d from rod %d to rod %d, \n", n, a, b);
+			hanoi(n-1,c,b,a);
+		}
+	}
+
+	void main(){
+		callout("printf","Enter the number: \n");
+		n1=10;
+		hanoi(n1,1,2,3);
+	}
+}

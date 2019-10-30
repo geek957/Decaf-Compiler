@@ -1,0 +1,42 @@
+class Program
+{
+	int a[100];
+	int b[100];
+	int sum[100];
+	int n;
+	int i;
+	void main()
+	{
+		n=5;
+		callout("printf","Enter the size of vectors: %d\n",n);
+
+		callout("printf","The elements of first vector are: \n");
+		for i = 1, n
+		{
+			a[i]=i*5+2;
+			callout("printf","%d ",a[i]);
+			callout("printf","\n ");
+		}
+
+		callout("printf","The elements of second vector are: \n");
+		for i = 1, n
+		{
+			b[i]=i*6+3;
+			callout("printf","%d ",b[i]);
+			callout("printf","\n ");
+		}
+
+		for i = 1, n
+		{
+			sum[i]=a[i]+b[i];
+		}
+
+		callout("printf","The sum of given vectors is: \n");
+		for i = 1, n
+		{
+			callout("printf", "%d, ", sum[i]);
+		}
+		callout("printf", "\n");
+
+	}
+}

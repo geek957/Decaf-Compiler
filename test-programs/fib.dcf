@@ -1,0 +1,23 @@
+class Program{
+	int n;
+	int i;
+	int ans;
+	int temp1;
+	int temp2;
+
+	void main()
+	{
+		n=10;
+		callout("printf","Entered number: %d\n",n);
+		ans=1;
+		temp1=1;
+		for i = 2,n
+		{
+			temp2=ans+temp1;
+			temp1=ans;
+			ans=temp2;
+		}
+		callout("printf","Given fibonacci number is: \n");
+		callout("printf","%d ",ans);
+	}
+}

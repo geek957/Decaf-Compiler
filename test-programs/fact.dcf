@@ -1,0 +1,16 @@
+class Program{
+	int n;
+	int i;
+	int ans;
+	void main(){
+		int kk;
+		n=10;
+		callout("printf","Enter the number: %d \n",n);
+		ans=1;
+		for kk = 1,n
+		{
+			ans = ans * kk;
+		}
+		callout("printf","Factorial of given number is: %d\n",ans);
+	}
+}

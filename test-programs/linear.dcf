@@ -1,0 +1,41 @@
+class Program
+{
+	int a[100];
+	int n;
+	int flag;
+	int i;
+	int c;
+	void main()
+	{
+		n=5; 
+		callout("printf","Enter the number of elements %d \n",n);
+		callout("printf","The elements are \n");
+		for i = 0,n
+		{
+			a[i]=i+2;
+			callout("printf","%d ",a[i]);
+		}
+
+		flag=0;
+		c=5;
+		callout("printf","Enter the element to search: %d\n",c);
+
+		for i = 0, n
+		{
+			if(a[i]==c)
+			{
+				flag=1;
+				break;
+			}
+		}
+
+		if(flag==1)
+		{
+			callout("printf", "element found\n");
+		}
+		else
+		{
+			callout("printf", "element not found\n");
+		}
+	}
+}

@@ -1,0 +1,39 @@
+class Program
+{
+	int v1[100];
+	int mini;
+
+	int maxi;
+
+	void main()
+	{
+		int n,i;
+		mini = 0;
+		maxi = 100;	
+		n = 10;
+
+
+		for i = 0, n
+		{
+			v1[i] = i;
+		}
+
+		for i = 0, n
+		{
+			if ( v1[i] > maxi)
+          	{
+      			maxi = v1[i];
+          	}
+          	if ( v1[i] < mini)
+          	{
+            	mini = v1[i];
+          	}
+		}		
+
+
+		callout("printf","Maximum element found in the array is %d\n",maxi);
+        callout("printf","Minimum element found in the array is %d\n",mini);
+
+	}
+
+}

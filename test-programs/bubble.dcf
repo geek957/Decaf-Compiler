@@ -1,0 +1,41 @@
+class Program
+{
+// max size of array 100
+	int v1[100];
+
+	void main()
+	{
+		int n,j,i;
+		n = 10;
+		
+
+		for i=0,n
+		{
+			v1[i]=10-i;
+		}
+		for i=0,n
+		{
+			for j=0,n-1
+			{
+				if( v1[j] > v1[j+1] )
+				{
+					int temp;
+					temp = v1[j+1];
+					v1[j+1] = v1[j];
+					v1[j] = temp;
+				}
+			}
+		}
+		callout("printf", "The final sorted order  is : \n");
+		
+		for i = 0, n
+		{
+			callout("printf", "%d " , v1[i]);
+		}
+		
+		callout("printf", "\n");
+
+
+	}
+
+}

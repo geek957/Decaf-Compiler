@@ -1,0 +1,383 @@
+%{
+	#include <bits/stdc++.h>
+	#include "ast.h"
+	extern FILE *yyin;
+	extern char* yytext;
+	extern "C" int yylex();
+	extern int yyparse();
+	extern FILE *yyin;
+	extern int line_num;
+	extern int errors;
+	void yyerror(const char *s);
+	int errors=0;
+	class Program* start = NULL;
+%}
+
+%union{
+  	int number;
+  	char *str;
+  	char chr;
+	class Program *pro;
+	class Field_declarations *fd_ds;
+	class Field_declaration *fd_d;
+	class Var_declarations *vr_ds;
+	class Var_declaration *vr_d;
+	class Method_declarations *md_ds;
+	class Method_declaration *md_d;
+	class Method_args_declarations *md_ag_ds;
+	class Method_args_declaration *md_ag_d;
+	class Block *blk;
+	class Field_method_declarations *fd_md_ds;
+	class Field_method_declaration *fd_md_d;
+	class Var_method_declarations *vr_md_ds;
+	class Var_method_declaration *vr_md_d;
+	class Statements *stmnts;
+	class Statement *stmnt;
+	class Assignment *assgnmnt;
+	class If_else *ifelse;
+	class Forr *forr;
+	class Return *ret;
+	class Break *brk;
+	class Continue *cont;
+	class Assign_op *assign_op;
+	class Function_call *func_call;
+	class Method_call *mthd_call;
+	class Call_out *call_out;
+	class Call_out_args *call_out_args;
+	class Call_out_arg *call_out_arg;
+	class Location *loc;
+	class Exprs *exprs;
+	class Expr *expr;
+	class Literal *lit;
+	class Integer_literal *int_lit;
+	class Char_literal *char_lit;
+	class Bool_literal *bool_lit;
+	class Binary_expr *bnry_expr;
+	class Unary_expr *unry_expr;
+	class Bracket_expr *brckt_expr;
+  }
+
+
+
+%token CLASS
+%token PROGRAM
+%token <str> TYPE
+%token <str> VOID
+%token IF
+%token FOR
+%token RETURN
+%token BREAK
+%token CONTINUE
+%token ELSE
+%token CALLOUT
+%token <str> BOOL_LIT
+%token <str> GE
+%token <str> LE
+%token <str> PLE
+%token <str> SUE
+%token <str> EE
+%token <str> NE
+%token <str> EXCL
+%token <str> '='
+%token <str> GT
+%token <str> LT
+%token <str> PLUS
+%token <str> MINUS
+%token <str> MUL
+%token <str> DIV
+%token <str> MOD
+%token <str> AND
+%token <str> OR
+%token ','
+%token '}'
+%token '{'
+%token ']'
+%token '['
+%token ')'
+%token '('
+%token ';'
+%token <number> INT_LIT
+%token <str> CHAR
+%token <str> STRING
+%token <str> ID
+
+%left EE NE
+%left AND OR
+%left LT GT LE GE
+%left PLUS MINUS
+%left MUL DIV MOD
+%right EXCL '='
+
+%type <pro> program
+%type <fd_ds> field_decls
+%type <fd_d> field_decl
+%type <vr_ds> vars_array_incl
+%type <vr_d> var_array_incl
+%type <md_ds> method_decls
+%type <md_d> method_decl
+%type <md_ag_ds> meth_arg_decls
+%type <md_ag_d> meth_arg_decl
+%type <blk> block
+%type <fd_md_ds> field_method_decls 
+%type <fd_md_d> field_method_decl
+%type <vr_md_ds> vars_method
+%type <vr_md_d> var_method
+%type <stmnts> statements 
+%type <stmnt> statement
+%type <assign_op> assign_op
+%type <func_call> function_call
+%type <call_out_args> callout_args
+%type <call_out_arg> callout_arg
+%type <loc> location
+%type <exprs> exprs
+%type <expr> expr
+%type <lit> lit
+
+
+
+
+
+
+%%
+program : CLASS  PROGRAM '{' field_decls method_decls '}' 
+							{
+  								$$ = new Program($4, $5);
+    							start = $$;
+  							}
+		| CLASS  PROGRAM '{' field_decls '}'
+							{
+  								$$ = new Program($4, NULL);
+    							start = $$;
+  							}
+		| CLASS  PROGRAM '{' method_decls '}'
+							{
+  								$$ = new Program(NULL, $4);
+    							start = $$;
+  							}
+		| CLASS  PROGRAM '{' '}'
+							{
+  								$$ = new Program(NULL, NULL);
+    							start = $$;
+  							}
+
+/* FIELD DECLARATIONS */
+field_decls : field_decl 
+					{$$ = new Field_declarations(); $$->Push_back($1);}
+			| field_decls field_decl 
+					{$$->Push_back($2);}
+
+field_decl : TYPE vars_array_incl ';'
+					{$$ = new Field_declaration(string($1), $2);}
+
+vars_array_incl : var_array_incl 
+					{$$ = new Var_declarations(); $$->Push_back($1);}
+				| vars_array_incl ',' var_array_incl
+					{$$->Push_back($3);}
+
+var_array_incl : ID 
+					{$$ = new Var_declaration(string($1));}
+			   | ID '[' INT_LIT ']'
+			   		{$$ = new Var_declaration(string($1),$3);}
+
+/* METHOD DECLARATIONS */
+method_decls : method_decl
+				{$$ = new Method_declarations(); $$->Push_back($1);} 
+			 | method_decls method_decl
+			 	{$$->Push_back($2);}
+
+method_decl : TYPE ID '(' meth_arg_decls ')' block
+				{$$ = new Method_declaration(string($1), string($2), $4, $6);}
+			| TYPE ID '(' ')' block
+				{$$ = new Method_declaration(string($1), string($2), NULL, $5);}
+			| VOID ID '(' meth_arg_decls ')' block
+				{$$ = new Method_declaration(string($1), string($2), $4, $6);}
+			| VOID ID '(' ')' block
+				{$$ = new Method_declaration(string($1), string($2), NULL, $5);}
+
+meth_arg_decls : meth_arg_decl 
+					{$$ = new Method_args_declarations(); $$->Push_back($1);}
+			   | meth_arg_decls ',' meth_arg_decl
+			   		{$$->Push_back($3);}
+
+meth_arg_decl : TYPE ID
+					{$$ = new Method_args_declaration(string($1), string($2));}
+
+block : '{' field_method_decls statements '}'
+			{$$ = new Block($2, $3);}
+	  | '{' field_method_decls '}'
+	  		{$$ = new Block($2, NULL);}
+	  | '{' statements '}'
+	  		{$$ = new Block(NULL, $2);}
+	  | '{' '}'
+	  		{$$ = new Block(NULL, NULL);}
+
+field_method_decls : field_method_decl
+						{$$ = new Field_method_declarations(); $$->Push_back($1);}
+			  	   | field_method_decls field_method_decl
+			  	   		{$$->Push_back($2);}
+
+field_method_decl : TYPE vars_method ';'
+						{$$ = new Field_method_declaration(string($1), $2);}
+
+vars_method : var_method
+				{$$ = new Var_method_declarations(); $$->Push_back($1);}
+			| vars_method ',' var_method
+				{$$->Push_back($3);}
+
+var_method : ID {$$ = new Var_method_declaration(string($1));}
+
+
+statements : statement 
+				{$$ = new Statements(); $$->Push_back($1);}
+		   | statements statement 
+		   		{$$->Push_back($2);}
+
+statement : location assign_op expr ';' 
+				{$$ = new Assignment($1,$2,$3);}
+ 		  | function_call ';'
+ 		  		{$$ = $1;}
+ 		  | IF '(' expr ')' block ELSE block 
+ 		  		{$$ = new If_else($3,$5,$7);}
+ 		  | IF '(' expr ')' block 
+ 		  		{$$ = new If_else($3,$5,NULL);}
+ 		  | FOR ID '=' expr ',' expr block
+ 		  		{$$ = new Forr(string($2),$4,$6,$7);}
+ 		  | RETURN expr ';'
+ 		  		{$$ = new Return($2);}
+ 		  | RETURN ';'
+ 		  		{$$ = new Return(NULL);}
+ 		  | BREAK ';'
+ 		  		{$$ = new Break();}
+ 		  | CONTINUE ';'
+ 		  		{$$ = new Continue();}
+ 		  | block
+ 		  		{$$ = $1;}
+
+
+
+assign_op : '=' 
+				{$$ = new Assign_op(string($1));}
+		  | PLE
+		  		{$$ = new Assign_op(string($1));}
+		  | SUE 
+		  		{$$ = new Assign_op(string($1));}
+
+function_call : ID '(' exprs ')'
+				{$$ = new Method_call(string($1),$3);}
+			| ID '(' ')'
+				{$$ = new Method_call(string($1),NULL);}
+			| CALLOUT '(' STRING  callout_args ')'
+				{$$ = new Call_out(string($3),$4);}
+			| CALLOUT '(' STRING ')'
+				{$$ = new Call_out(string($3),NULL);}
+
+callout_args : ',' callout_arg 
+				{$$ = new Call_out_args(); $$->Push_back($2);} 
+			 | callout_args ',' callout_arg
+			 	{$$->Push_back($3);}
+
+callout_arg : expr
+				{$$ = new Call_out_arg($1);}
+			| STRING
+				{$$ = new Call_out_arg(string($1));}
+
+location : ID
+				{$$ = new Location(string($1));}
+		 | ID '[' expr ']'
+		 		{$$ = new Location(string($1),$3);}
+
+exprs : expr
+			{$$ = new Exprs(); $$->Push_back($1);}
+	  | exprs ',' expr
+	  		{$$->Push_back($3);}
+
+expr : location
+			{$$ = $1;}
+	 | function_call
+	 		{$$ = $1;}
+	 | lit
+	 		{$$ = $1;}
+	 | expr PLUS expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr MINUS expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr MUL expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr DIV expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr MOD expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr LT expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr GT expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr LE expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr GE expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr EE expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr NE expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr AND expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | expr OR expr
+	 		{$$ = new Binary_expr($1,string($2),$3);}
+	 | MINUS expr
+	 		{$$ = new Unary_expr(string($1),$2);}
+	 | EXCL expr
+	 		{$$ = new Unary_expr(string($1),$2);}
+	 | '(' expr ')'
+	 		{$$ = new Bracket_expr($2);}
+
+
+lit : INT_LIT
+		{$$ = new Integer_literal($1);}
+	| CHAR
+		{$$ = new Char_literal(string($1));}
+	| BOOL_LIT
+		{$$ = new Bool_literal(string($1));}
+
+
+
+
+
+%%
+
+main(int argc, char **argv)
+{
+	if(argc == 1)
+    {
+		fprintf(stderr, "Correct usage: bcc filename\n");
+		exit(1);
+	}
+	if(argc > 2)
+    {
+		fprintf(stderr, "Passing more arguments than necessary.\n");
+		fprintf(stderr, "Correct usage: bcc filename\n");
+	}
+	
+	printf("Starting\n");
+	yyin = fopen(argv[1], "r");
+	yyparse();
+	printf("Parsing Over\n");
+
+	cout<<"----------------------------->Started dfs\n";
+	DFS* dfs;
+	dfs=new DFS();
+	start->accept(dfs);
+	cout<<"----------------------------->Done dfs :)"<<endl;
+	if(start)
+	{
+		cout<<"Started generating LLVM-IR"<<endl;
+		start->generateCode();
+		//cout<<"Started generating LLVM-IR"<<endl;
+		start->generateCodeDump();
+		cout<<"LLVM-IR generated\n";
+	}
+}
+
+void yyerror(const char *s)
+{
+	fprintf(stderr, "error: %s\n", s);
+}

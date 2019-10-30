@@ -1,0 +1,11 @@
+class Program{
+	void main(){
+		int x,i;
+		x = 0;
+		for i=0, 99{
+			x = x+1;
+		}
+		callout("printf","%d",x);
+	}
+
+}

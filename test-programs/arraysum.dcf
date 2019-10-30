@@ -1,0 +1,30 @@
+class Program
+{
+	// max size of array 100
+	int v1[100];
+	int ans;
+	int n;
+
+	void main()
+	{
+		int i;
+		ans = 0;
+		n = 10;
+
+
+		for i = 0, n
+		{
+			v1[i] = i;
+		}
+
+
+		for i = 0, n
+		{
+			ans = ans + v1[i];
+		}		
+
+		callout("printf", "The sum of given vector is : %d\n",ans);
+
+	}
+
+}
